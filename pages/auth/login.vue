@@ -1,8 +1,31 @@
 <script setup>
 import { ref } from 'vue';
-const email = ref('');
+const phone = ref('');
 const password = ref('');
-const checked = ref(false);
+const remember = ref(false);
+
+const authStore = useAuthStore()
+const toast = useToast();
+const router = useRouter()
+
+async function login() {
+  if (!phone.value || !password.value){
+    toast.add({ summary: "Ошибка", severity: "error", detail: "Вы не заполнили поля", life: 3000})
+    return
+  }
+  const result = await authStore.login(phone, password, remember)
+  console.log(result)
+  if(result.status != 200){
+    toast.add({ summary: "Ошибка", severity: "error", detail: result.data, life: 3000})
+  } else {
+    toast.add({ summary: "Удачно", severity: "success", detail: "Вы авторизовались", life: 3000})
+    router.push({path: "/"})
+  }
+}
+definePageMeta({
+  title: 'Персона - Авторизация',
+  need_not_auth: true
+})
 </script>
 
 <template>
@@ -22,8 +45,8 @@ const checked = ref(false);
             <div>
               <label for="email1"
                 class="block text-surface-900 text-xl font-medium mb-2">Номер телефона</label>
-              <InputMask id="email1" type="phone" mask="+7 999-99-9999" placeholder="+7 999-99-9999" class="w-full md:w-[30rem] mb-8"
-                v-model="email" />
+              <InputMask id="email1" type="phone" mask="+7 999-999-99 99" placeholder="+7 999-999-99 99" class="w-full md:w-[30rem] mb-8"
+                v-model="phone" />
 
               <label for="password1"
                 class="block text-surface-900 font-medium text-xl mb-2">Пароль</label>
@@ -32,12 +55,12 @@ const checked = ref(false);
 
               <div class="flex items-center justify-between mt-2 mb-8 gap-8">
                 <div class="flex items-center">
-                  <Checkbox v-model="checked" id="rememberme1" binary class="mr-2"></Checkbox>
+                  <Checkbox v-model="remember" id="rememberme1" binary class="mr-2"></Checkbox>
                   <label for="rememberme1">Запомни меня</label>
                 </div>
                 <span class="font-medium no-underline ml-2 text-right cursor-pointer text-primary">Забыли пароль?</span>
               </div>
-              <Button label="Войти" class="w-full" as="router-link" to="/"></Button>
+              <Button label="Войти" class="w-full" @click="login"></Button>
             </div>
           </div>
         </div>

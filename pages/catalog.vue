@@ -69,96 +69,15 @@ const time_map = {
   "2 ч": 2
 }
 
-const catalog = ref([
-  {
-    title: "Детский стиль (до 14 лет)",
-    image: "/img/catalog/785092027395315051.png",
-    cost: ["1400", "1800", "2300", "3000"],
-    duration: "1 ч",
-    category: category.haircuts
-  },
-  {
-    title: "Детский стиль (до 5 лет)",
-    image: "/img/catalog/785090365242950200.png",
-    cost: ["1000", "1200", "1500", "2000"],
-    duration: "1 ч",
-    category: category.haircuts
-  },
-  {
-    title: "Коррекция челки",
-    image: "/img/catalog/785091821236882054.png",
-    cost: ["600", "700", "1000", "1200"],
-    duration: "30 мин",
-    category: category.haircuts
-  },
-  {
-    title: "Стиль",
-    image: "/img/catalog/785092418237344012.png",
-    cost: ["1800", "2500", "3100", "4000"],
-    duration: "1 ч",
-    category: category.haircuts
-  },
-  {
-    title: "Прическа вечерняя",
-    image: "/img/catalog/785092701705188756.png",
-    cost: ["-", "3700", "5000", "5900"],
-    duration: "1.5 ч",
-    category: category.styling
-  },
-  {
-    title: "Укладка дневная",
-    image: "/img/catalog/785093049597543915.png",
-    cost: ["1600", "2000", "2500", "3100"],
-    duration: "1 ч",
-    category: category.styling
-  },
-  {
-    title: "Укладка коктейльная",
-    image: "/img/catalog/785093603648331578.png",
-    cost: ["2300", "3200", "4400", "4800"],
-    duration: "1 ч",
-    category: category.styling
-  },
-  {
-    title: "Экспресс укладка",
-    image: "/img/catalog/785094161994086696.png",
-    cost: ["1400", "1600", "2200", "2600"],
-    duration: "30 мин",
-    category: category.styling
-  },
-  {
-    title: "Блондирование",
-    image: "/img/catalog/blonde.webp",
-    cost: ["3000", "3600", "4000", "4400"],
-    duration: "1 ч",
-    category: category.colorbar
-  },
-  {
-    title: "Мелирование",
-    image: "/img/catalog/melir.webp",
-    cost: ["5300", "6400", "8000", "8800"],
-    duration: "2 ч",
-    category: category.colorbar
-  },
-  {
-    title: "Окрашивание",
-    image: "/img/catalog/paint.webp",
-    cost: ["4900", "5900", "7300", "8200"],
-    duration: "1.5 ч",
-    category: category.colorbar
-  },
-  {
-    title: "Тонирование",
-    image: "/img/catalog/ton.webp",
-    cost: ["4200", "5000", "5500", "6100"],
-    duration: "1.5 ч",
-    category: category.colorbar
-  }
-])
+const catalog_store = useCalatogStore()
+
+await callOnce(catalog_store.fetch)
+
 
 const filtered = computed(() => {
+  let catalog = catalog_store.catalog
   let search = search_text.value.toLowerCase();
-  let filtered = catalog.value.filter(function (elem) {
+  let filtered = catalog.filter(function (elem) {
     if (selectedCategories.value.length != 0) {
       if (!selectedCategories.value.includes(elem.category))
         return false

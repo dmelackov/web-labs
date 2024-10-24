@@ -1,9 +1,47 @@
 <script setup>
 import { ref } from 'vue';
-const email = ref('');
+const phone = ref('');
 const password = ref('');
 const repeat_password = ref('')
 const politics1 = ref(false);
+const politics2 = ref(false);
+
+const authStore = useAuthStore()
+const toast = useToast();
+const router = useRouter()
+
+
+async function registration() {
+  if (!phone.value || !password.value || !repeat_password.value){
+    toast.add({ summary: "Ошибка", severity: "error", detail: "Вы не заполнили поля", life: 3000})
+    return
+  }
+  if(!politics1.value) {
+    toast.add({ summary: "Ошибка", severity: "error", detail: "Вы не приняли соглашение о пользовании", life: 3000})
+    return
+  }
+  if(!politics2.value) {
+    toast.add({ summary: "Ошибка", severity: "error", detail: "Вы не приняли использование куки", life: 3000})
+    return
+  }
+  if(password.value != repeat_password.value){
+    toast.add({ summary: "Ошибка", severity: "error", detail: "Указанные пароли не совпадают", life: 3000})
+    return
+  }
+  const result = await authStore.registration(phone.value, password.value, repeat_password.value)
+  if(result.status != 200){
+    toast.add({ summary: "Ошибка", severity: "error", detail: result.data, life: 3000})
+  } else {
+    toast.add({ summary: "Удачно", severity: "success", detail: "Вы зарегистрировались", life: 3000})
+    router.push({path: "/auth/login"})
+  }
+}
+
+
+definePageMeta({
+  title: 'Персона - Регистрация',
+  need_not_auth: true
+})
 </script>
 
 <template>
@@ -21,8 +59,8 @@ const politics1 = ref(false);
 
             <div>
               <label for="email1" class="block text-surface-900 text-xl font-medium mb-2">Номер телефона</label>
-              <InputMask id="email1" type="phone" mask="+7 999-99-9999" placeholder="+7 999-99-9999"
-                class="w-full md:w-[30rem] mb-8" v-model="email" />
+              <InputMask id="email1" type="phone" mask="+7 999-999-99 99" placeholder="+7 999-999-99 99"
+                class="w-full md:w-[30rem] mb-8" v-model="phone" />
 
               <label for="password1" class="block text-surface-900 font-medium text-xl mb-2">Пароль</label>
               <Password id="password1" v-model="password" placeholder="Пароль" :toggleMask="true" class="mb-4" fluid
@@ -38,7 +76,14 @@ const politics1 = ref(false);
                   <label for="politics1">Я принимаю условия соглашения о пользовании</label>
                 </div>
               </div>
-              <Button label="Зарегестрироваться" class="w-full" as="router-link" to="/"></Button>
+
+              <div class="flex items-center justify-between mt-2 mb-8 gap-8">
+                <div class="flex items-center">
+                  <Checkbox v-model="politics2" id="politics2" binary class="mr-2"></Checkbox>
+                  <label for="politics2">Я принимаю политику cookie</label>
+                </div>
+              </div>
+              <Button label="Зарегистрироваться" class="w-full" @click="registration"></Button>
             </div>
           </div>
         </div>

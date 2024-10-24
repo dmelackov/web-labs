@@ -32,9 +32,12 @@
         </ul>
         <div class="flex border-t lg:border-t-0 border-surface py-4 lg:py-0 mt-4 lg:mt-0 gap-8">
           <NuxtLink class="font-medium text-xl text-gray-50 hover:text-gray-400 transition-colors duration-500"
-            :class="{ 'text-gray-950': scrolled }" to="/auth/login">Авторизация</NuxtLink>
+            :class="{ 'text-gray-950': scrolled }" to="/auth/login" v-if="!authStore.isAuth">Авторизация</NuxtLink>
           <NuxtLink class="font-medium text-xl text-gray-50 hover:text-gray-400 transition-colors duration-500"
-            :class="{ 'text-gray-950': scrolled }" to="/auth/registration">Регистрация</NuxtLink>
+            :class="{ 'text-gray-950': scrolled }" to="/auth/registration" v-if="!authStore.isAuth">Регистрация
+          </NuxtLink>
+          <p class="font-medium text-xl text-gray-50 hover:text-gray-400 transition-colors duration-500"
+            :class="{ 'text-gray-950': scrolled }" @click="logout" v-if="authStore.isAuth">{{ authStore.userInfo.phone }}</p>
         </div>
       </div>
     </div>
@@ -42,6 +45,14 @@
 </template>
 
 <script setup>
+const authStore = useAuthStore()
+const toast = useToast();
+
+async function logout() {
+    await authStore.logout()
+    toast.add({ summary: "Вы вышли из аккаунта", severity: "success", life: 3000})
+}
+
 defineProps({
   scrolled: Boolean
 })

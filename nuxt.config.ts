@@ -28,7 +28,8 @@ export default defineNuxtConfig({
     '@primevue/nuxt-module',
     '@nuxtjs/tailwindcss',
     '@vueuse/nuxt',
-    'vue-yandex-maps/nuxt'
+    'vue-yandex-maps/nuxt',
+    '@pinia/nuxt'
   ],
   primevue: {
     options: {
@@ -45,5 +46,10 @@ export default defineNuxtConfig({
   },
   css: [
     'primeicons/primeicons.css'
-  ]
+  ],
+  runtimeConfig: {
+    public: {
+      baseURL: 'http://localhost:8000',
+    },
+  }
 })
