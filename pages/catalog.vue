@@ -13,15 +13,19 @@
           </div>
           <p class="text-xl mt-5 mb-2">Цена</p>
           <div class="flex flex-row justify-between mb-3">
-            <InputNumber type="number" class="min-w-0 w-1/3" v-model.number="cost_filter[0]" :min="0" :max="10000"></InputNumber>
-            <InputNumber type="number" class="w-1/3" v-model.number="cost_filter[1]" :min="0" :max="10000"></InputNumber>
+            <InputNumber type="number" class="min-w-0 w-1/3" v-model.number="cost_filter[0]" :min="0" :max="10000">
+            </InputNumber>
+            <InputNumber type="number" class="w-1/3" v-model.number="cost_filter[1]" :min="0" :max="10000">
+            </InputNumber>
           </div>
           <Slider v-model="cost_filter" range class="w-full" :min="0" :max="10000" />
           <p class="text-xl mt-5 mb-2">Длительность</p>
           <div class="flex flex-row justify-between mb-3">
-            <InputNumber type="number" class="w-1/3" v-model.number="duration_filter[0]"  :maxFractionDigits="1" :step="0.5" :min="0" :max="2">
+            <InputNumber type="number" class="w-1/3" v-model.number="duration_filter[0]" :maxFractionDigits="1"
+              :step="0.5" :min="0" :max="2">
             </InputNumber>
-            <InputNumber type="number" class="w-1/3" v-model.number="duration_filter[1]"  :maxFractionDigits="1 " :step="0.5" :min="0" :max="2">
+            <InputNumber type="number" class="w-1/3" v-model.number="duration_filter[1]" :maxFractionDigits="1"
+              :step="0.5" :min="0" :max="2">
             </InputNumber>
           </div>
           <Slider v-model="duration_filter" range class="w-full" :min="0" :max="2" :step="0.5" />
@@ -35,13 +39,36 @@
           </InputGroup>
           <div class="overflow-y-scroll min-h-0 flex-grow h-32">
             <div class="grid grid-cols-4 gap-3">
-              <Service class="w-" v-for="service in filtered" :service="service"></Service>
+              <Service class="w-" v-for="service in filtered" :service="service" @opened="openDialog(service)">
+              </Service>
             </div>
           </div>
         </div>
       </div>
       <div>
         <Footer> </Footer>
+        <Dialog v-model:visible="addDialogVisible" modal header="Запись" :style="{ width: '30rem' }">
+          <p class="text-2xl">Услуга: {{ openedItem.title }}</p>
+          <div class="flex flex-col gap-2 mt-2">
+            <div class="flex items-center justify-between">
+              <Button class="w-36" :disabled="openedItem.cost[3] == '-'" @click="addToCart(3)">Топ стилист</Button>
+              <p class="text-xl"> {{ openedItem.cost[3] }} ₽</p>
+            </div>
+            <div class="flex items-center justify-between">
+              <Button class="w-36" :disabled="openedItem.cost[2] == '-'" @click="addToCart(2)">Стилист</Button>
+              <p class="text-xl"> {{ openedItem.cost[2] }} ₽</p>
+            </div>
+            <div class="flex items-center justify-between">
+              <Button class="w-36" :disabled="openedItem.cost[1] == '-'" @click="addToCart(1)">Топ мастер</Button>
+              <p class="text-xl"> {{ openedItem.cost[1] }} ₽</p>
+            </div>
+            <div class="flex items-center justify-between">
+              <Button class="w-36" :disabled="openedItem.cost[0] == '-'" @click="addToCart(0)">Мастер</Button>
+              <p class="text-xl"> {{ openedItem.cost[0] }} ₽</p>
+            </div>
+          </div>
+
+        </Dialog>
       </div>
     </div>
 
@@ -50,10 +77,32 @@
 
 <script setup>
 
+const cartStore = useMyCartStore()
+const toast = useToast();
 const search_text = ref("")
 const selectedCategories = ref([])
 const cost_filter = ref([0, 10000])
 const duration_filter = ref([0, 2])
+
+const openedItem = ref(null)
+const addDialogVisible = ref(false)
+
+function openDialog(item) {
+  openedItem.value = item
+  addDialogVisible.value = true
+}
+
+async function addToCart(cost_index) {
+  const workers = ["Мастер", "Топ мастер", "Стилист", "Топ стилист"]
+  await cartStore.add_item({
+    cost: Number.parseInt(openedItem.value.cost[cost_index]),
+    worker: workers[cost_index],
+    item: openedItem.value
+  })
+  toast.add({ summary: "Добавлено в корзину", severity: "success", detail: `Запись к ${workers[cost_index]} на услугу ${openedItem.value.title} добавлена в корзину`, life: 3000})
+  openedItem.value = null
+  addDialogVisible.value = false
+}
 
 const category =
 {
@@ -87,14 +136,14 @@ const filtered = computed(() => {
     let mapped_cost = []
     for (let i = 0; i < elem.cost.length; i++) {
       const element = elem.cost[i];
-      if (element != "-"){
+      if (element != "-") {
         mapped_cost.push(Number.parseInt(element))
       }
     }
     mapped_cost.sort()
-    if(cost_filter.value[0] > mapped_cost[mapped_cost.length - 1])
+    if (cost_filter.value[0] > mapped_cost[mapped_cost.length - 1])
       return false
-    if(cost_filter.value[1] < mapped_cost[0])
+    if (cost_filter.value[1] < mapped_cost[0])
       return false
     if (search === "") return true;
     else return elem.title.toLowerCase().indexOf(search) > -1;

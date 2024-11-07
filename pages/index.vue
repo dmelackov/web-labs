@@ -11,7 +11,8 @@
           <p class="font-normal text-2xl leading-normal md:mt-4 text-gray-300">
             Ваш стиль - наша страсть!
           </p>
-          <NuxtLink class="p-4 bg-gray-50 w-max mt-6 hover:bg-gray-400 transition-colors duration-200" to="/catalog">Записаться
+          <NuxtLink class="p-4 bg-gray-50 w-max mt-6 hover:bg-gray-400 transition-colors duration-200" to="/catalog">
+            Записаться
           </NuxtLink>
         </div>
       </section>
@@ -145,17 +146,18 @@
         <div class="h-full flex justify-between flex-col">
           <div class="flex-grow pt-20 px-20">
             <h2 class="text-8xl text-left">Отчеты с мероприятий</h2>
-            <div class="flex flex-row justify-center gap-10 mt-20 px-0">
-              <div>
-                <img src="~/assets/img/event_1.png" alt="">
-                <p class="text-2xl text-gray-950">Рождественнская песенка года</p>
-                <p class="text-1xl h-12 text-gray-700">30 декабря 2023</p>
-              </div>
-              <div>
-                <img src="~/assets/img/event_2.png" alt="">
-                <p class="text-2xl text-gray-950">Грандиозное ледовое шоу Ильи Авербуха "Кармен"</p>
-                <p class="text-1xl h-12 text-gray-700">5 декабря 2023</p>
-              </div>
+            <div class="w-full flex justify-center mt-10">
+              <Carousel class="min-w-0" :value="events" :numVisible="1" :numScroll="1" circular="true">
+                <template #item="slotProps">
+                  <div class="w-full flex justify-center">
+                    <div class="w-max">
+                      <img :src="slotProps.data.image" alt="">
+                      <p class="text-2xl text-gray-950">{{ slotProps.data.title }}</p>
+                      <p class="text-1xl h-12 text-gray-700">{{ slotProps.data.date }}</p>
+                    </div>
+                  </div>
+                </template>
+              </Carousel>
             </div>
           </div>
           <Footer class="self-end"></Footer>
@@ -169,8 +171,21 @@
 const el = ref(null)
 const { x, y, isScrolling, arrivedState, directions } = useScroll(el)
 
+const events = [
+  {
+    title: "Рождественнская песенка года",
+    image: "/img/event_1.png",
+    date: "30 декабря 2023"
+  },
+  {
+    title: "Грандиозное ледовое шоу Ильи Авербуха \"Кармен\"",
+    image: "/img/event_2.png",
+    date: "5 декабря 2023"
+  }
+]
+
 const scrolled = computed(() => {
- return y.value > 10
+  return y.value > 10
 })
 
 definePageMeta({

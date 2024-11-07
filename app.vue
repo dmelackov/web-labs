@@ -8,9 +8,4 @@
 
 
 <script setup>
-
-const authStore = useAuthStore()
-
-
-await callOnce(authStore.fetch)
 </script>

@@ -13,11 +13,16 @@
         <p>{{ service.duration }}</p>
       </div>
     </div>
-    <NuxtLink class="bg-surface-950 text-gray-50 w-full text-center py-2" to="/contacts">Записаться</NuxtLink>
+    <p class="bg-surface-950 text-gray-50 w-full text-center py-2 cursor-pointer" @click="openEvent">Записаться</p>
   </div>
 </template>
 
 <script setup>
+const emit = defineEmits(["opened"])
+
+function openEvent(){
+  emit("opened")
+}
 const props = defineProps({
   service: Object
 })
